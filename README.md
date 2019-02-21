@@ -1,9 +1,9 @@
-# An example using Remot Access to Cache data into an infinispan server via REST
+# An example using Remote Access to cache data using an Infinispan Server via REST
 
 ## System requirements
 - Java 8.0^ (Java SDK 1.8)
 - Maven 3.0^
-- [Infinispan Server](http://infinispan.org/download/).
+- [Infinispan Server 9.4.6.Final](http://downloads.jboss.org/infinispan/9.4.6.Final/infinispan-server-9.4.6.Final.zip).
 
 ## Configure maven to download artifacts from JBoss repositories
 In `~/.m2/settings.xml` add the following profiles:
@@ -35,26 +35,9 @@ In `~/.m2/settings.xml` add the following profiles:
     </pluginRepository>
   </pluginRepositories>
 </profile>
-<profile>
-  <id>jboss</id>
-  <repositories>
-    <repository>
-      <id>archetype</id>
-      <url>http://repository.jboss.org/nexus/content/groups/public</url>
-      <releases>
-        <enabled>true</enabled>
-        <checksumPolicy>fail</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <checksumPolicy>warn</checksumPolicy>
-      </snapshots>
-    </repository>
-  </repositories>
-</profile>
 ```
 
-## Configure Infinispan server
+## Configure Infinispan Server
 1. This example uses JDBC to store the cache. To permit this, it's necessary to alter Infinispan configuration file `INFINISPAN_HOME/standalone/configuration/standalone.xml` to contain the followin definitions:
 
 ```xml
@@ -116,11 +99,16 @@ In `~/.m2/settings.xml` add the following profiles:
 ```shell
 INFINISPAN_HOME/bin/standalone.sh
 ```
+Note: if you already have the environment variable $JBOSS_HOME set to another instance of Java AS (e.g. WildFly), make sure to unset this variable in the terminal instance running the infinispan server by typing `unset JBOSS_HOME`.
 
 ### Build and Run the example
 1. Make sure you have started the infinispan server
 2. Navigate to the root directory of this example
-3. Run the example application in its directory:
+3. Build and deploy the archive
+```shell
+mvn clean package
+```
+4. Run the example application in its directory
 ```shell
 mvn exec:java
 ```
