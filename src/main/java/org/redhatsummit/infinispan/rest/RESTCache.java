@@ -1,11 +1,8 @@
 package org.redhatsummit.infinispan.rest;
 
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;

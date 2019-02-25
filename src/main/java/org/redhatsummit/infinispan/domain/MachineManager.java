@@ -1,22 +1,23 @@
-package org.redhatsummit.infinispan.rest;
+package org.redhatsummit.infinispan.domain;
 
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.crypto.Mac;
-
-import org.redhatsummit.infinispan.domain.MachineComponent;
+import org.infinispan.client.hotrod.RemoteCache;
+import org.infinispan.client.hotrod.RemoteCacheManager;
+import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
+import org.redhatsummit.infinispan.rest.RESTCache;
 
 public class MachineManager {
 
     private static final String INFINISPAN_HOST = "infinispan.host";
     // REST specific properties
     public static final String HTTP_PORT = "infinispan.http.port";
+    public static final String HOTROD_PORT = "infinispan.hotrod.port";
     public static final String REST_CONTEXT_PATH = "infinispan.rest.context.path";
     private static final String PROPERTIES_FILE = "infinispan.properties";
     private static final String cacheName = "components";
@@ -29,12 +30,25 @@ public class MachineManager {
             + "q   -  quit\n";
 
     private BufferedReader br;
-    private RESTCache<String, Object> cache;
+//    private RESTCache<String, Object> cache;
+    private RemoteCacheManager cacheManager;
+    private RemoteCache<String, Object> cache;
 
     public MachineManager(BufferedReader br) {
         this.br = br;
-        cache = new RESTCache<>(cacheName, "http://" + infinispanProperty(INFINISPAN_HOST) + ":" + infinispanProperty(HTTP_PORT)
-                + infinispanProperty(REST_CONTEXT_PATH));
+        /* REST */
+//        cache = new RESTCache<>(cacheName, "http://" + infinispanProperty(INFINISPAN_HOST) + ":" + infinispanProperty(HTTP_PORT)
+//                + infinispanProperty(REST_CONTEXT_PATH));
+        /* End REST */
+
+        /* HotRod */
+        ConfigurationBuilder builder = new ConfigurationBuilder();
+        builder.addServer()
+                .host(infinispanProperty(INFINISPAN_HOST))
+                .port(Integer.parseInt(infinispanProperty(HOTROD_PORT)));
+        cacheManager = new RemoteCacheManager(builder.build());
+        cache = cacheManager.getCache(cacheName);
+        /* End HotRod */
     }
 
     public void addMachineComponent() {
