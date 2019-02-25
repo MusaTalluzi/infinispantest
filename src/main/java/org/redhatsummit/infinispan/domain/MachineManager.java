@@ -10,6 +10,7 @@ import java.util.Properties;
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
+import org.redhatsummit.infinispan.listeners.RemoteListener;
 import org.redhatsummit.infinispan.rest.RESTCache;
 
 public class MachineManager {
@@ -48,6 +49,7 @@ public class MachineManager {
                 .port(Integer.parseInt(infinispanProperty(HOTROD_PORT)));
         cacheManager = new RemoteCacheManager(builder.build());
         cache = cacheManager.getCache(cacheName);
+        cache.addClientListener(new RemoteListener());
         /* End HotRod */
     }
 
