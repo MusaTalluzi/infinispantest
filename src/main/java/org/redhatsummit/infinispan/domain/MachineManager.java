@@ -11,15 +11,11 @@ import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
 import org.redhatsummit.infinispan.listeners.RemoteListener;
-import org.redhatsummit.infinispan.rest.RESTCache;
 
 public class MachineManager {
 
     private static final String INFINISPAN_HOST = "infinispan.host";
-    // REST specific properties
-    public static final String HTTP_PORT = "infinispan.http.port";
     public static final String HOTROD_PORT = "infinispan.hotrod.port";
-    public static final String REST_CONTEXT_PATH = "infinispan.rest.context.path";
     private static final String PROPERTIES_FILE = "infinispan.properties";
     private static final String cacheName = "components";
 
@@ -31,18 +27,12 @@ public class MachineManager {
             + "q   -  quit\n";
 
     private BufferedReader br;
-//    private RESTCache<String, Object> cache;
     private RemoteCacheManager cacheManager;
     private RemoteCache<String, Object> cache;
 
     public MachineManager(BufferedReader br) {
         this.br = br;
-        /* REST */
-//        cache = new RESTCache<>(cacheName, "http://" + infinispanProperty(INFINISPAN_HOST) + ":" + infinispanProperty(HTTP_PORT)
-//                + infinispanProperty(REST_CONTEXT_PATH));
-        /* End REST */
 
-        /* HotRod */
         ConfigurationBuilder builder = new ConfigurationBuilder();
         builder.addServer()
                 .host(infinispanProperty(INFINISPAN_HOST))
@@ -50,7 +40,6 @@ public class MachineManager {
         cacheManager = new RemoteCacheManager(builder.build());
         cache = cacheManager.getCache(cacheName);
         cache.addClientListener(new RemoteListener());
-        /* End HotRod */
     }
 
     public void addMachineComponent() {

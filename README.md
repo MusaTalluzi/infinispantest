@@ -1,4 +1,4 @@
-# An example using Remote Access to cache data using an Infinispan Server via REST
+# An example using Remote Access to cache data using an Infinispan Server via HotRod
 
 ## System requirements
 - Java 8.0^ (Java SDK 1.8)
@@ -88,10 +88,6 @@ In `~/.m2/settings.xml` add the following profiles:
     </cache-container>
 </subsystem>
 ```
-3. Disable REST endpoint security: by default the standalone.xml configuration protects the REST endpoint with BASIC authentication. Since this example cannot perform authentication, the REST connector should be configured without it: under `<subsystem xmlns="urn:infinispan:server:endpoint:9.4">`:
-```xml
-<rest-connector socket-binding="rest" cache-container="local"/>
-```
 
 ## Run the example
 
@@ -111,4 +107,10 @@ mvn clean package
 4. Run the example application in its directory
 ```shell
 mvn exec:java
+```
+
+# Use Hibernate OGM
+Since Hibernate OGM uses a distributed-cache by default, run the server with `clustered.xml` configuration.
+```shell
+INFINISPAN_HOME/bin/standalone.sh -c clustered.xml
 ```

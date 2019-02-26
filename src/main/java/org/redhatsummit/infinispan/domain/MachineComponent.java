@@ -3,13 +3,19 @@ package org.redhatsummit.infinispan.domain;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class MachineComponent implements Serializable {
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
+@Entity
+public class MachineComponent implements Serializable {
+    @Id
     private Long id;
     private double attrition;
 
-    public MachineComponent(Long id, double attrition) {
+    public MachineComponent() {
+    }
 
+    public MachineComponent(Long id, double attrition) {
         this.id = id;
         this.attrition = attrition;
     }
