@@ -8,6 +8,7 @@ import javax.persistence.Id;
 
 @Entity
 public class MachineComponent implements Serializable {
+
     @Id
     private Long id;
     private double attrition;

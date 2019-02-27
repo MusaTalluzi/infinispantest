@@ -21,7 +21,10 @@ public class InfinispanRemoteTest {
         EntityManager em = emf.createEntityManager();
         MachineComponent loadedComponent = em.find(MachineComponent.class, component.getId());
 
-        assert loadedComponent != null;
+        assert component.equals(loadedComponent);
+
+        em.remove(loadedComponent);
+        tm.commit();
     }
 
     private void persistTestData(EntityManagerFactory entityManagerFactory, MachineComponent component) throws Exception {
