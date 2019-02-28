@@ -114,3 +114,33 @@ Since Hibernate OGM uses a distributed-cache by default, run the server with `cl
 ```shell
 INFINISPAN_HOME/bin/standalone.sh -c clustered.xml
 ```
+# Test listening to cache events:
+We will test sending damageEvents from one application via HotRod protocol and listening to them from another application. To test it out:
+1. Configure the cache that will store damageEvents `clustered.xml`:
+```xml
+<local-cache name="DamageEventHotRod" start="EAGER" batching="false">
+    <persistence passivation="false">
+        <string-keyed-jdbc-store name="STRING_KEYED_JDBC_STORE" datasource="java:jboss/datasources/ExampleDS" preload="false" purge="false">
+            <string-keyed-table prefix="infinispan">
+                <id-column name="id" type="VARCHAR" />
+                <data-column name="datum" type="BINARY" />
+                <timestamp-column name="version" type="BIGINT" />
+            </string-keyed-table>
+        </string-keyed-jdbc-store>
+    </persistence>
+</local-cache>
+```
+2. Run the Infinispan server:
+```shell
+INFINISPAN_HOME/bin/standalone.sh -c clustered.xml
+```
+3. Start `optaplanner-app`: Web app built spring boot. You can start it either from an IDE or from the command line
+- `mvn clean package`
+- `java -jar optaplanner-demo.jar`
+4. Open browser on http://localhost:8081. Add the cache name `DamageEventHotRod` and click `listen`. This is the cahce name you configured in `clustered.xml`.
+5. Run `damagesourceapp`:
+- `mvn clean package`
+- `mvn exec:java`
+> If you run it from an IDE, run `org.redhatsummit.damagesource.SendDamageEventsHotRod`.
+
+Once you start sending damage events, you will see them in the browser. By default, one damage event is sent per second, to modify this set `EVENTS_PER_SECOND` in `org.redhatsummit.damagesource.SendDamageEventsHotRod`.

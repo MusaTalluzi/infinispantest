@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hello View</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/main.css" rel="stylesheet">
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script src="/app.js"></script>
+</head>
+<body id="main-content" class="container">
+<div class="row" style="background-color: #283e4a;">
+    <div class="col-md-12">
+        <form class="form-inline">
+            <div class="form-group">
+                <label for="shortName" style="color: white">Listen to a Cache</label>
+                <input type="text" id="shortName" class="form-control" placeholder="Enter the cache name">
+                <button id="connect" class="btn btn-default" type="submit">Listen</button>
+                <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Stop listening</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row" style="...">
+    <div class="col"><h2>Events</h2></div>
+    <table id="events" class="table table-striped">
+        <tbody id="cacheEvents">
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

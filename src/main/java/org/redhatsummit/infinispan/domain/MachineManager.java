@@ -15,7 +15,7 @@ import org.redhatsummit.infinispan.listeners.RemoteListener;
 public class MachineManager {
 
     private static final String INFINISPAN_HOST = "infinispan.host";
-    public static final String HOTROD_PORT = "infinispan.hotrod.port";
+    private static final String HOTROD_PORT = "infinispan.hotrod.port";
     private static final String PROPERTIES_FILE = "infinispan.properties";
     private static final String cacheName = "components";
 
@@ -29,6 +29,7 @@ public class MachineManager {
     private BufferedReader br;
     private RemoteCacheManager cacheManager;
     private RemoteCache<String, Object> cache;
+    private RemoteCache damageEventCache;
 
     public MachineManager(BufferedReader br) {
         this.br = br;
@@ -39,7 +40,10 @@ public class MachineManager {
                 .port(Integer.parseInt(infinispanProperty(HOTROD_PORT)));
         cacheManager = new RemoteCacheManager(builder.build());
         cache = cacheManager.getCache(cacheName);
+        damageEventCache = cacheManager.getCache(DamageEvent.class.getSimpleName());
         cache.addClientListener(new RemoteListener());
+        damageEventCache.addClientListener(new RemoteListener());
+        System.out.println("MachineManager.MachineManager: " + damageEventCache.getDataFormat());
     }
 
     public void addMachineComponent() {

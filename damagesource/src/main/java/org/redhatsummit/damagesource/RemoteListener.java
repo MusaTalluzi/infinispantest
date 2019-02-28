@@ -1,4 +1,4 @@
-package org.redhatsummit.infinispan.listeners;
+package org.redhatsummit.damagesource;
 
 import org.infinispan.client.hotrod.annotation.ClientCacheEntryCreated;
 import org.infinispan.client.hotrod.annotation.ClientCacheEntryExpired;
