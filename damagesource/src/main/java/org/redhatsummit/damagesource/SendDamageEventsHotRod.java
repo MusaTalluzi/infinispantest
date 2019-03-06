@@ -1,21 +1,16 @@
 package org.redhatsummit.damagesource;
 
-import java.time.Instant;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
-import io.netty.util.internal.ThreadLocalRandom;
-import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.RemoteCounterManagerFactory;
 import org.infinispan.client.hotrod.configuration.Configuration;
-import org.infinispan.commons.configuration.XMLStringConfiguration;
-import org.infinispan.commons.util.CloseableIteratorSet;
 import org.infinispan.counter.api.CounterConfiguration;
 import org.infinispan.counter.api.CounterManager;
 import org.infinispan.counter.api.CounterType;
 import org.infinispan.counter.api.StrongCounter;
+import org.infinispan.counter.exception.CounterOutOfBoundsException;
 
 public class SendDamageEventsHotRod {
 
@@ -59,17 +54,27 @@ public class SendDamageEventsHotRod {
                 .lowerBound(lowerBound)
                 .build();
 
+        counterManager.remove(healthCounterName);
         counterManager.defineCounter(healthCounterName, cc);
 
         StrongCounter strongCounter = counterManager.getStrongCounter(healthCounterName);
-
-        strongCounter.getValue().thenAccept(System.out::println);
-
         random.setSeed(13);
         while (true) {
             for (int i = 0; i < eventsPerSecond; i++) {
                 int decremntBy = random.nextInt(initialValue) % 10;
-                strongCounter.addAndGet((long) decremntBy * -1).thenAccept(System.out::println);
+                strongCounter
+                        .addAndGet((long) decremntBy * -1)
+                        .handle((aLong, throwable) -> {
+                            System.out.println("SendDamageEventsHotRod.main: " + Thread.currentThread().toString());
+                            if (throwable instanceof CounterOutOfBoundsException) {
+                                System.out.println("Decrementing by: " + decremntBy * -1);
+                            }
+                            return aLong;
+                        })
+                        .thenAccept(aLong -> {
+                            System.out.println("SendDamageEventsHotRod.main: " + Thread.currentThread().toString());
+                            System.out.println(aLong);
+                        });
             }
             Thread.sleep(1000);
         }

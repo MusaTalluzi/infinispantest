@@ -18,6 +18,7 @@ import org.infinispan.commons.configuration.XMLStringConfiguration;
 import org.infinispan.counter.api.CounterEvent;
 import org.infinispan.counter.api.CounterListener;
 import org.infinispan.counter.api.CounterManager;
+import org.infinispan.counter.api.CounterState;
 import org.infinispan.counter.api.StrongCounter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -91,11 +92,17 @@ public class HelloController {
         System.out.println("HelloController.handleCacheSubscribtion: " + counterName);
         CounterManager counterManager = RemoteCounterManagerFactory.asCounterManager(remoteCacheManager);
         StrongCounter strongCounter = counterManager.getStrongCounter(counterName);
-        strongCounter.addListener(new RemoteListener());
+        strongCounter.addListener(new RemoteListener(strongCounter));
     }
 
     @ClientListener()
     private class RemoteListener implements CounterListener {
+
+        private StrongCounter strongCounter;
+
+        public RemoteListener(StrongCounter strongCounter) {
+            this.strongCounter = strongCounter;
+        }
 
         @ClientCacheEntryCreated
         @ClientCacheEntryModified
@@ -109,6 +116,9 @@ public class HelloController {
         @Override
         public void onUpdate(CounterEvent entry) {
             System.out.println("RemoteListener.onUpdate: " + entry);
+            if (entry.getNewState().equals(CounterState.LOWER_BOUND_REACHED)) {
+                strongCounter.sync().reset();
+            }
         }
     }
 
