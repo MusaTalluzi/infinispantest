@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -41,7 +42,7 @@ import static org.junit.Assert.assertEquals;
 public class AsyncDamageEventsTest {
 
     private static final String HEALTH_COUNTER_NAME = "health.counter.name";
-    private static final int NUM_THREADS = 1;
+    private static final int NUM_THREADS = 10;
     private static final int NUM_DECREMENTS_PER_THREAD = 10;
     private static final String HEALTH_COUNTER_INITIAL_VALUE = "health.counter.initial.value";
     private static final String HEALTH_COUNTER_LOWER_BOUND = "health.counter.lower.bound";
@@ -70,7 +71,7 @@ public class AsyncDamageEventsTest {
         Configuration configuration = ClientConfiguration.get().build();
         RemoteCacheManager remoteCacheManager = new RemoteCacheManager(configuration);
         CounterManager counterManager = RemoteCounterManagerFactory.asCounterManager(remoteCacheManager);
-        String counterName = infinispanProperty(HEALTH_COUNTER_NAME);
+        String counterName = "machine-" + (new Random()).nextInt(20);  // infinispanProperty(HEALTH_COUNTER_NAME);
         if (counterManager.isDefined(counterName)) {
             LOGGER.info("Health counter exist: removing it.");
             counterManager.remove(counterName);
@@ -166,7 +167,7 @@ public class AsyncDamageEventsTest {
         public List<Future<Integer>> call() throws InterruptedException {
             List<Future<Integer>> decrementFutureList = new ArrayList<>(NUM_DECREMENTS_PER_THREAD);
             for (int i = 0; i < NUM_DECREMENTS_PER_THREAD; i++) {
-                decrementFutureList.add(strongCounter.decrementAndGet()
+                decrementFutureList.add(strongCounter.addAndGet(-1000_0000_000_000_0L)
                         .handle((aLong, throwable) -> {
                             numAttemptedDecrements.incrementAndGet();
                             LOGGER.info("Handling... by " + Thread.currentThread());

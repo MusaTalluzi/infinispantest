@@ -16,7 +16,7 @@ function setConnected(connected) {
 
 function connect() {
     // create the SockJS WebSocket-like object
-	socket = new SockJS('/optaplanner-app');
+	socket = new SockJS('optaplanner-demo.datagrid-demo.svc/optaplanner-app');
 	
 	// specify that we're using the STOMP protocol on the socket
     stompClient = Stomp.over(socket);

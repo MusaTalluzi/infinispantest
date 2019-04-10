@@ -5,7 +5,12 @@ import java.util.Properties;
 
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
+import org.infinispan.client.hotrod.annotation.ClientCacheEntryCreated;
+import org.infinispan.client.hotrod.annotation.ClientCacheEntryModified;
+import org.infinispan.client.hotrod.annotation.ClientListener;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
+import org.infinispan.client.hotrod.event.ClientCacheEntryCreatedEvent;
+import org.infinispan.client.hotrod.event.ClientCacheEntryModifiedEvent;
 import org.junit.jupiter.api.Test;
 import org.redhatsummit.infinispan.domain.MachineComponent;
 
@@ -23,6 +28,7 @@ public class InfinispanRemoteHotRodClientTest {
                 .port(Integer.parseInt(infinispanProperty(HOTROD_PORT)));
         RemoteCacheManager cacheManager = new RemoteCacheManager(builder.build());
         RemoteCache<String, Object> cache = cacheManager.getCache(cacheName);
+        cache.addClientListener(new RemoteListener2(cache));
 
         MachineComponent component = new MachineComponent(0L, 0.0);
         cache.put(component.getId().toString(), component);
@@ -43,6 +49,28 @@ public class InfinispanRemoteHotRodClientTest {
                 throw new RuntimeException(e);
             }
             return props.getProperty(name);
+        }
+    }
+
+    @ClientListener()
+    private class RemoteListener2 {
+
+        private RemoteCache<String, Object> remoteCache;
+
+        public RemoteListener2(RemoteCache<String, Object> remoteCache) {
+            this.remoteCache = remoteCache;
+        }
+
+        @ClientCacheEntryCreated
+        public void handleRemoteEvent(ClientCacheEntryCreatedEvent<String> event) {
+            System.out.println("RemoteListener.handleRemoteEvent: " + event);
+            System.out.println(remoteCache.get(event.getKey()));
+        }
+
+        @ClientCacheEntryModified
+        public void handleRemoteEvent(ClientCacheEntryModifiedEvent<String> event) {
+            System.out.println("RemoteListener.handleRemoteEvent: " + event);
+            System.out.println(remoteCache.get(event.getKey()));
         }
     }
 }
