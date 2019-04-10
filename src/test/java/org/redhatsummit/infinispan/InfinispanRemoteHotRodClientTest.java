@@ -18,7 +18,7 @@ public class InfinispanRemoteHotRodClientTest {
     private static final String INFINISPAN_HOST = "infinispan.host";
     public static final String HOTROD_PORT = "infinispan.hotrod.port";
     private static final String PROPERTIES_FILE = "infinispan.properties";
-    private static final String cacheName = "components";
+    private static final String cacheName = "default";
 
     @Test
     public void addAndRetrieveComponentTest() throws InterruptedException {
